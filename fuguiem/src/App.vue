@@ -11,7 +11,11 @@ const meta = data.meta
 const uniq = (arr) => [...new Set(arr)].sort((a, b) => a.localeCompare(b, 'ja'))
 const allTypes = ['ダイナミック', 'マルチDD', 'ハイブリッド', 'トライブリッド', '平面駆動', 'BA型']
   .filter((t) => all.some((i) => i.type === t))
-const allBrands = uniq(all.map((i) => i.brand))
+// メーカーは収録数の多い順（同数なら名前順）に並べる。
+const brandCounts = {}
+all.forEach((i) => (brandCounts[i.brand] = (brandCounts[i.brand] || 0) + 1))
+const allBrands = [...new Set(all.map((i) => i.brand))]
+  .sort((a, b) => brandCounts[b] - brandCounts[a] || a.localeCompare(b, 'ja'))
 const allSignatures = uniq(all.map((i) => i.signature))
 const allConnectors = uniq(all.map((i) => i.connector))
 // タグは出現頻度の高い順に。
@@ -24,6 +28,7 @@ const allTags = Object.keys(tagCount).sort((a, b) => tagCount[b] - tagCount[a])
 // そのまま追跡するため、フィルタ用の集合はここに集約する。
 // （ref を template から関数に渡すと自動アンラップで素の値になり扱いづらい）
 const q = ref('')
+const brandQuery = ref('')
 const sort = ref('price-asc')
 const sel = reactive({
   bands: new Set(),
@@ -73,6 +78,14 @@ const filtered = computed(() => {
 })
 
 const bandCount = (id) => all.filter((i) => i.band.id === id).length
+const brandCount = (b) => brandCounts[b] || 0
+
+// メーカー名サブ検索。選択中のものは絞り込んでも消えないようにする。
+const shownBrands = computed(() => {
+  const kw = brandQuery.value.trim().toLowerCase()
+  if (!kw) return allBrands
+  return allBrands.filter((b) => b.toLowerCase().includes(kw) || sel.brands.has(b))
+})
 </script>
 
 <template>
@@ -102,6 +115,19 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       </div>
 
       <div class="filter-block">
+        <h2>メーカー</h2>
+        <input v-model="brandQuery" class="search subsearch" type="search"
+          placeholder="メーカー名で絞り込み" />
+        <div class="scroll-list">
+          <label v-for="b in shownBrands" :key="b" class="chk">
+            <input type="checkbox" :checked="sel.brands.has(b)" @change="toggle('brands', b)" />
+            <span>{{ b }}</span><span class="cnt">{{ brandCount(b) }}</span>
+          </label>
+          <p v-if="!shownBrands.length" class="no-hit">該当メーカーなし</p>
+        </div>
+      </div>
+
+      <div class="filter-block">
         <h2>ドライバ型式</h2>
         <label v-for="t in allTypes" :key="t" class="chk">
           <input type="checkbox" :checked="sel.types.has(t)" @change="toggle('types', t)" />
@@ -125,14 +151,6 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
             {{ t }}
           </button>
         </div>
-      </div>
-
-      <div class="filter-block">
-        <h2>ブランド</h2>
-        <label v-for="b in allBrands" :key="b" class="chk">
-          <input type="checkbox" :checked="sel.brands.has(b)" @change="toggle('brands', b)" />
-          <span>{{ b }}</span>
-        </label>
       </div>
 
       <div class="filter-block">

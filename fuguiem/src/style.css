@@ -44,6 +44,9 @@ a { color: var(--accent); }
   font-size: .9rem;
 }
 .search:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.subsearch { font-size: .82rem; padding: 7px 10px; margin-bottom: 8px; }
+.scroll-list { max-height: 240px; overflow-y: auto; padding-right: 2px; }
+.no-hit { font-size: .8rem; color: var(--muted); padding: 6px 2px; margin: 0; }
 
 .chk {
   display: flex; align-items: center; gap: 8px;
