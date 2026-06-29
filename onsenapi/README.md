@@ -18,36 +18,34 @@ npm run dev      # 開発サーバ (http://localhost:5173)
 npm run build    # 本番ビルド → dist/
 ```
 
-## Cloudflare Pages へのデプロイ
+## Cloudflare Workers へのデプロイ
 
-静的SPA + Pages Functions（画像プロキシ）構成。サーバー不要。
+静的アセット(`dist`) + Worker(`worker/index.js` の画像プロキシ)構成。設定は `wrangler.jsonc`。
 
-### 方法A: GitHub連携（推奨）
-Cloudflare ダッシュボード → Workers & Pages → Create → Pages → 「Connect to Git」で
-`formylcho/apps` を選択し、以下を設定（モノレポのためルートを `onsenapi` に）:
+### 方法A: GitHub連携（Workers Builds・推奨）
+Cloudflare ダッシュボード → Workers & Pages → Create → 「Connect to Git」で
+`formylcho/apps` を選び、以下を設定（モノレポのためルートを `onsenapi` に）:
 
-| 設定 | 値 |
+| 項目 | 値 |
 |------|----|
 | Production branch | `main` |
-| Root directory (advanced) | `onsenapi` |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
+| ルートディレクトリ | `onsenapi` |
+| ビルドコマンド | `npm run build` |
+| デプロイコマンド | `npx wrangler deploy` |
+| 非本番ブランチのデプロイコマンド | `npx wrangler versions upload`（任意） |
 
-`onsenapi/functions/img-proxy.js`（spa.or.jp 画像のプロキシ＆キャッシュ）は自動で検出されます。
+`wrangler.jsonc` の `assets.directory: ./dist` と `main: worker/index.js` が自動で使われます。
 
-### 方法B: Wrangler CLI
+### 方法B: ローカルから Wrangler CLI
 ```bash
-npx wrangler login            # 初回のみ
-npm run build
-npx wrangler pages deploy dist --project-name onsenapi
+npx wrangler login    # 初回のみ
+npm run deploy        # = npm run build && wrangler deploy
 ```
-※ CLI で関数も配信するには Pages プロジェクトに `functions/` を含める必要があるため、
-   通常は方法A（Git連携）が簡単です。
 
 ### 補足
 - 乗換API（api.transit.ls8h.com）・OSMタイルは外部サービスをブラウザから直接利用（CORS開放）。
-- 画像は本番では `/img-proxy?url=...`（Pages Function）経由でホットリンク制限を回避＆エッジキャッシュ。
-- 位置情報（現在地から出発）は HTTPS 必須。Cloudflare Pages は標準でHTTPS。
+- 画像は本番では `/img-proxy?url=...`（Worker）経由でホットリンク制限を回避＆エッジキャッシュ。
+- 位置情報（現在地から出発）は HTTPS 必須。Workers は標準でHTTPS。
 
 ## データの再生成
 

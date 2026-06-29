@@ -1,8 +1,8 @@
-// Cloudflare Pages Function: spa.or.jp の画像をプロキシ＆エッジキャッシュする。
-// /img-proxy?url=<spa.or.jp の画像URL>
-// ブラウザのリファラを送らずに取得するため、ホットリンク制限を回避できる。
-export async function onRequest(context) {
-  const { request } = context
+// Cloudflare Worker エントリ
+// - /img-proxy?url=...  : spa.or.jp の画像をリファラ無しで取得＆エッジキャッシュ（ホットリンク回避）
+// - それ以外           : 静的アセット(./dist)を配信（ASSETS バインディング）
+
+async function handleImgProxy(request, ctx) {
   const reqUrl = new URL(request.url)
   const target = reqUrl.searchParams.get('url')
   if (!target) return new Response('missing url', { status: 400 })
@@ -32,6 +32,14 @@ export async function onRequest(context) {
   resp.headers.set('Cache-Control', 'public, max-age=86400, s-maxage=604800')
   resp.headers.set('Access-Control-Allow-Origin', '*')
   resp.headers.delete('set-cookie')
-  context.waitUntil(cache.put(request, resp.clone()))
+  ctx.waitUntil(cache.put(request, resp.clone()))
   return resp
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url)
+    if (url.pathname === '/img-proxy') return handleImgProxy(request, ctx)
+    return env.ASSETS.fetch(request)
+  },
 }

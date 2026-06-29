@@ -1,0 +1,14 @@
+{
+  // Cloudflare Workers（静的アセット + /img-proxy）設定
+  // デプロイ: npx wrangler deploy（ビルドで生成した ./dist を配信）
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "onsenapi",
+  "main": "worker/index.js",
+  "compatibility_date": "2024-11-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // クライアントルーティングは無いが、将来の ?onsen=ID 等に備え SPA フォールバック
+    "not_found_handling": "single-page-application"
+  }
+}
