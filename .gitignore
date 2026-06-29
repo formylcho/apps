@@ -1,0 +1,11 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+
+# dependencies / build (各サブプロジェクトの .gitignore も参照)
+node_modules/
+dist/
+.next/

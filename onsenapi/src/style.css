@@ -1,0 +1,80 @@
+:root {
+  --bg: #0f172a;
+  --panel: #ffffff;
+  --ink: #1e293b;
+  --muted: #64748b;
+  --accent: #e11d48;
+  --accent-soft: #ffe4e6;
+  --line: #e2e8f0;
+  --shadow: 0 8px 30px rgba(15, 23, 42, 0.18);
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN",
+    "Yu Gothic", Meiryo, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  color: var(--ink);
+  background: #f1f5f9;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* Leaflet の温泉名ラベル */
+.onsen-label {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.leaflet-tooltip.onsen-label::before {
+  display: none;
+}
+
+/* 温泉ピン（♨アイコン） */
+.onsen-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.onsen-pin span {
+  transform: rotate(45deg);
+}
+.onsen-pin.is-active {
+  background: #be123c;
+  width: 38px;
+  height: 38px;
+  font-size: 22px;
+  z-index: 1000;
+}

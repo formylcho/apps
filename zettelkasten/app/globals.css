@@ -1,0 +1,268 @@
+:root {
+  --bg: #fbfaf7;
+  --fg: #2b2b2b;
+  --muted: #8a8a82;
+  --line: #e4e2da;
+  --accent: #3b6ea5;
+  --accent-soft: #eef3f9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui,
+    sans-serif;
+  line-height: 1.8;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 120px;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.brand {
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.brand:hover {
+  color: var(--accent);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+textarea.compose {
+  width: 100%;
+  min-height: 220px;
+  border: none;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 17px;
+  line-height: 2;
+}
+
+textarea.append {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  outline: none;
+  resize: vertical;
+  background: #fff;
+  color: var(--fg);
+  font: inherit;
+  font-size: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+button.btn {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+button.btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+button.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button.btn.primary:hover {
+  background: #335f90;
+  color: #fff;
+}
+
+button.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.section-title {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+
+/* メニューの大きな選択肢 */
+.menu-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.12s ease;
+}
+
+.menu-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(59, 110, 165, 0.08);
+}
+
+.menu-card .t {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.menu-card .d {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ツリー表示 */
+.tree {
+  border-left: 2px solid var(--line);
+  padding-left: 0;
+  margin-top: 8px;
+}
+
+.node {
+  position: relative;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.node:hover {
+  background: var(--accent-soft);
+}
+
+.node.selected {
+  background: var(--accent-soft);
+  outline: 1px solid var(--accent);
+}
+
+.node .ruby {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-right: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.node .body {
+  white-space: pre-wrap;
+  font-size: 16px;
+  vertical-align: top;
+}
+
+.children {
+  margin-left: 22px;
+  border-left: 1px dashed var(--line);
+}
+
+/* ツリー一覧カード */
+.tree-card {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.tree-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(59, 110, 165, 0.08);
+}
+
+.tree-card .ruby {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.tree-card .preview {
+  font-size: 16px;
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tree-card .count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 15px;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.fade {
+  animation: fade 0.25s ease;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
