@@ -1,0 +1,21 @@
+{
+  "name": "fuguiem",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "ふぐみかんIEMデータベース — チャンネルで紹介された中華イヤホンを価格帯・スペック・特徴で絞り込み検索",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "crawl": "node scripts/crawl.mjs",
+    "validate": "node scripts/validate.mjs"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.7"
+  }
+}
