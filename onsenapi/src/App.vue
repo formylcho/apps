@@ -66,12 +66,13 @@ function select(id) {
       <MapView :onsen="filtered" :selected-id="selectedId" @select="select" />
     </div>
 
-    <!-- 右: 詳細パネル -->
-    <transition name="slide">
-      <div v-if="selected" class="panel-wrap">
-        <DetailPanel :onsen="selected" @close="selectedId = null" />
-      </div>
-    </transition>
+    <!-- モバイル: パネル表示中の地図側オーバーレイ -->
+    <div v-if="selected" class="scrim" @click="selectedId = null"></div>
+
+    <!-- 右(モバイルは全画面): 詳細パネル -->
+    <div v-if="selected" class="panel-wrap">
+      <DetailPanel :onsen="selected" @close="selectedId = null" />
+    </div>
   </div>
 </template>
 
@@ -156,6 +157,8 @@ function select(id) {
   position: relative;
   min-width: 0;
 }
+/* 詳細パネル。resting state は transform 無し（= 正しい位置）。
+   スライドインは animation の forwards で行い、再生されなくても位置は崩れない。 */
 .panel-wrap {
   position: fixed;
   top: 0;
@@ -163,16 +166,13 @@ function select(id) {
   width: 380px;
   max-width: 92vw;
   height: 100%;
+  background: var(--panel);
   box-shadow: var(--shadow);
   z-index: 1500;
 }
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.25s ease;
-}
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(100%);
+/* デスクトップでは地図クリック遮蔽は不要 */
+.scrim {
+  display: none;
 }
 
 @media (max-width: 760px) {
@@ -181,10 +181,19 @@ function select(id) {
     grid-template-rows: auto 1fr;
   }
   .sidebar {
-    max-height: 38vh;
+    max-height: 40vh;
   }
+  /* モバイルは全画面 */
   .panel-wrap {
     width: 100%;
+    max-width: 100%;
+  }
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    z-index: 1400;
   }
 }
 </style>

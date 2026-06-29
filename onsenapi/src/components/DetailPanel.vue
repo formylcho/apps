@@ -1,5 +1,6 @@
 <script setup>
 import TransitSearch from './TransitSearch.vue'
+import { proxiedImage } from '../utils/img.js'
 
 defineProps({
   onsen: { type: Object, default: null },
@@ -17,6 +18,21 @@ defineEmits(['close'])
       <div v-if="onsen.kana" class="kana">{{ onsen.kana }}</div>
       <p v-if="onsen.catch" class="catch">{{ onsen.catch }}</p>
     </header>
+
+    <section v-if="onsen.images && onsen.images.length" class="block gallery-block">
+      <div class="gallery">
+        <a
+          v-for="(img, i) in onsen.images"
+          :key="i"
+          :href="proxiedImage(img.full)"
+          target="_blank"
+          rel="noopener"
+          class="gallery-item"
+        >
+          <img :src="proxiedImage(img.thumb)" :alt="`${onsen.name}の写真${i + 1}`" loading="lazy" />
+        </a>
+      </div>
+    </section>
 
     <section v-if="onsen.summary" class="block">
       <h3>概要</h3>
@@ -38,9 +54,27 @@ defineEmits(['close'])
       <p class="multiline">{{ onsen.highlight }}</p>
     </section>
 
-    <section v-if="onsen.capacity" class="block">
-      <h3>温泉宿（収容力）</h3>
-      <p class="multiline">{{ onsen.capacity }}</p>
+    <section v-if="onsen.capacity || (onsen.inns && onsen.inns.length)" class="block">
+      <h3>温泉宿</h3>
+      <p v-if="onsen.capacity" class="capacity">収容力: {{ onsen.capacity }}</p>
+
+      <ul v-if="onsen.inns && onsen.inns.length" class="inns">
+        <li v-for="inn in onsen.inns" :key="inn.fid" class="inn">
+          <img v-if="inn.image" :src="proxiedImage(inn.image)" :alt="inn.name" class="inn-thumb" loading="lazy" />
+          <div class="inn-body">
+            <div class="inn-name">{{ inn.name }}</div>
+            <div class="inn-meta">
+              <span v-if="inn.spring">♨ {{ inn.spring }}</span>
+              <span v-if="inn.rooms">・{{ inn.rooms }}</span>
+            </div>
+            <div class="inn-links">
+              <a v-if="inn.officialUrl" :href="inn.officialUrl" target="_blank" rel="noopener">公式サイト</a>
+              <a :href="inn.detailUrl" target="_blank" rel="noopener">協会の宿情報</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <p v-else class="inns-note">個別の宿情報は下記の問い合わせ先（観光協会等）をご覧ください。</p>
     </section>
 
     <section v-if="onsen.access" class="block">
@@ -135,6 +169,78 @@ h2 {
   font-size: 14px;
   line-height: 1.7;
   color: #334155;
+}
+.gallery-block {
+  margin-top: 12px;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.gallery-item {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s;
+}
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+.capacity {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.inns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.inn {
+  display: flex;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+}
+.inn-thumb {
+  width: 84px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.inn-body {
+  min-width: 0;
+}
+.inn-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+.inn-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 2px 0 4px;
+}
+.inn-links {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+.inns-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
 }
 .contacts {
   margin: 0;

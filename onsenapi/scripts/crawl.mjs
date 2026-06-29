@@ -153,6 +153,20 @@ function parseDetail(html, base) {
   const effects = textAfterHeading(root, /適応症|効能/)
   const capacity = textAfterHeading(root, /収容力|宿泊施設数/)
 
+  // 写真ギャラリー(ss2): wp-content にアップされた温泉地の写真。
+  // サムネイル(…-WxH.jpg)を表示用、サフィックスを除いたものをフルサイズとして保持。
+  const images = []
+  const ss2 = root.querySelector('#ss2')
+  if (ss2) {
+    for (const img of ss2.querySelectorAll('img')) {
+      const src = img.getAttribute('src') || ''
+      if (!/wp-content\/uploads/.test(src)) continue
+      const thumb = src.startsWith('http') ? src : `https://www.spa.or.jp${src.replace(/^\.\.?/, '')}`
+      const full = thumb.replace(/-\d+x\d+(\.[a-z]+)$/i, '$1')
+      images.push({ thumb, full })
+    }
+  }
+
   // 問い合わせ先(ss5): リンクと電話番号
   const contacts = []
   const ss5 = root.querySelector('#ss5')
@@ -183,6 +197,8 @@ function parseDetail(html, base) {
     springQuality,
     effects,
     capacity,
+    images,
+    inns: [],
     contacts,
     officialUrl,
     sourceUrl: base.url,
@@ -283,6 +299,103 @@ async function geocodeAll(items) {
   return missing
 }
 
+// ---- おすすめの宿（日本温泉協会 会員宿）ディレクトリ ----
+const YADO_INDEX = 'https://www.spa.or.jp/osusume_no_yado2/list_index.htm'
+// 詳細ページのサイドバーに常時出てくる広告/共通リンク（公式サイト誤検出を防ぐ）
+const AD_DOMAINS = [
+  'gero-spa.com', 'kamiyamada-onsen.co.jp', 'hitou.or.jp', 'kannon-onsen.com',
+  'maniwa.or.jp', 'yasuragi.buyshop.jp', 'offandrelax.jp', 'onsen-gastronomy.com',
+  'env.go.jp', 'hisaka-magokoro.com', 'rurubu.travel', 'rurubu.com', 'facebook.com',
+  'twitter.com', 'instagram.com', 'youtube.com', 'jalan.net', 'rakuten',
+]
+
+// 温泉地名を照合用に正規化（温泉/温泉郷/区域・かっこ・地区サフィックスを除去）
+function normOnsen(s) {
+  return (s || '')
+    .replace(/[（(].*?[)）]/g, '')
+    .replace(/[－―\-].*$/, '')
+    .replace(/温泉郷|温泉群|温泉|区域|高原/g, '')
+    .replace(/\s/g, '')
+    .trim()
+}
+
+// おすすめの宿インデックスをパースして宿一覧を返す
+async function crawlInns() {
+  const html = await fetchHtml(YADO_INDEX)
+  const inns = []
+  const blocks = html.split(/(?=<a[^>]+detail_f)/)
+  for (const b of blocks) {
+    const m = b.match(/detail_f\/\?F_ID=(\d+)[^"]*"/)
+    if (!m) continue
+    const fid = m[1]
+    const nameM = b.match(/detail_f[^>]*>([\s\S]*?)<\/a>/)
+    const name = nameM ? clean(nameM[1].replace(/<[^>]+>/g, '')) : ''
+    if (!name) continue
+    const imgM = b.match(/<img[^>]+src="([^"]+)"/)
+    // src は list_index.htm からの相対 "../osusume_no_yado2/tempimage/x.jpg" → ルート基準で解決
+    const image = imgM
+      ? imgM[1].startsWith('http')
+        ? imgM[1]
+        : `https://www.spa.or.jp/${imgM[1].replace(/^(\.\.\/)+/, '')}`
+      : ''
+    const txt = clean(b.replace(/<[^>]+>/g, ' '))
+    const prefM = txt.match(/\[([^\]]+)\]/)
+    const prefecture = prefM ? prefM[1].trim() : ''
+    // 都道府県の後ろ〜TELの手前が温泉地名
+    const afterPref = prefM ? txt.slice(txt.indexOf(prefM[0]) + prefM[0].length) : txt
+    const onsenM = afterPref.match(/^\s*(.+?)\s*(?:TEL|電話|部屋|$)/)
+    const onsen = onsenM ? onsenM[1].trim() : ''
+    const roomM = txt.match(/部屋数[：:]\s*([0-9]+室)/)
+    const springM = txt.match(/主な泉質[】\]]\s*([^【\[]+)/)
+    inns.push({
+      fid,
+      name,
+      image,
+      prefecture,
+      onsen,
+      rooms: roomM ? roomM[1] : '',
+      spring: springM ? springM[1].trim() : '',
+      detailUrl: `https://www.spa.or.jp/search_f/detail_f/?F_ID=${fid}`,
+      officialUrl: '',
+    })
+  }
+  return inns
+}
+
+// 宿詳細ページから公式サイトURLを best-effort 抽出（広告ドメインを除外）
+async function fetchInnOfficial(inn) {
+  try {
+    const html = await fetchHtml(inn.detailUrl)
+    const links = [...html.matchAll(/href="(https?:\/\/[^"]+)"/g)].map((m) => m[1])
+    const cand = links.filter(
+      (l) => !/spa\.or\.jp/.test(l) && !AD_DOMAINS.some((d) => l.includes(d))
+    )
+    // 最頻ではなく最短ドメインの素朴なURL（クエリ無し）を優先
+    cand.sort((a, b) => a.length - b.length)
+    inn.officialUrl = cand[0] || ''
+  } catch {
+    inn.officialUrl = ''
+  }
+}
+
+// 宿を温泉地に紐付け
+function attachInns(items, inns) {
+  for (const inn of inns) {
+    const innKey = normOnsen(inn.onsen)
+    if (!innKey) continue
+    for (const o of items) {
+      if (inn.prefecture && o.prefecture && !inn.prefecture.includes(o.prefecture) && !o.prefecture.includes(inn.prefecture))
+        continue
+      const okey = normOnsen(o.name)
+      if (!okey) continue
+      if (innKey.includes(okey) || okey.includes(innKey)) {
+        o.inns.push(inn)
+        break
+      }
+    }
+  }
+}
+
 async function main() {
   await ensureCache()
   console.log('▶ 一覧ページを収集...')
@@ -301,12 +414,29 @@ async function main() {
     }
   }
 
+  console.log('▶ おすすめの宿を収集・紐付け...')
+  let innCount = 0
+  try {
+    const inns = await crawlInns()
+    attachInns(items, inns)
+    const matched = items.flatMap((o) => o.inns)
+    // 紐付いた宿のみ公式サイトURLを取得
+    for (const inn of matched) await fetchInnOfficial(inn)
+    innCount = matched.length
+    const withInns = items.filter((o) => o.inns.length).length
+    console.log(`  宿 ${inns.length} 件中 ${innCount} 件を ${withInns} 温泉地に紐付け`)
+  } catch (e) {
+    console.warn(`  宿の収集に失敗: ${e.message}`)
+  }
+
   console.log('▶ ジオコーディング (Nominatim)...')
   const missing = await geocodeAll(items)
 
   items.sort((a, b) => PREFS.indexOf(a.prefecture) - PREFS.indexOf(b.prefecture))
   await writeFile(OUT_FILE, JSON.stringify(items, null, 2))
-  console.log(`✅ ${OUT_FILE} に ${items.length} 件を書き出し（座標欠損 ${missing} 件）`)
+  console.log(
+    `✅ ${OUT_FILE} に ${items.length} 件を書き出し（座標欠損 ${missing} 件 / 宿紐付け ${innCount} 件）`
+  )
 }
 
 main().catch((e) => {

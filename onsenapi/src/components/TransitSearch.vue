@@ -22,6 +22,7 @@ const count = ref(4) // 表示する経路候補数
 const useShinkansen = ref(true) // 新幹線を使う
 const useExpress = ref(true) // 在来線特急を使う
 const loading = ref(false)
+const locating = ref(false)
 const error = ref('')
 const journeys = ref(null)
 
@@ -67,6 +68,35 @@ function pick(p) {
   origin.value = p
   query.value = p.name
   suggestions.value = []
+}
+
+// 現在地（GPS）を出発地に設定
+function useCurrentLocation() {
+  if (!navigator.geolocation) {
+    error.value = 'この端末では現在地を取得できません。'
+    return
+  }
+  locating.value = true
+  error.value = ''
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords
+      origin.value = {
+        name: '現在地',
+        endpoint: `geo:${latitude.toFixed(5)},${longitude.toFixed(5)}`,
+        lat: latitude,
+        lon: longitude,
+      }
+      query.value = '現在地'
+      suggestions.value = []
+      locating.value = false
+    },
+    () => {
+      error.value = '現在地を取得できませんでした。位置情報の許可をご確認ください。'
+      locating.value = false
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  )
 }
 
 const destGeo = computed(() => {
@@ -123,12 +153,23 @@ async function search() {
   <div class="transit">
     <label class="field">
       <span>出発地</span>
-      <input
-        v-model="query"
-        type="text"
-        placeholder="駅・施設・住所を入力（例: 東京）"
-        autocomplete="off"
-      />
+      <div class="origin-row">
+        <input
+          v-model="query"
+          type="text"
+          placeholder="駅・施設・住所を入力（例: 東京）"
+          autocomplete="off"
+        />
+        <button
+          type="button"
+          class="locate"
+          :disabled="locating"
+          title="現在地から出発"
+          @click="useCurrentLocation"
+        >
+          {{ locating ? '取得中…' : '📍現在地' }}
+        </button>
+      </div>
     </label>
     <ul v-if="suggestions.length" class="suggest">
       <li v-for="p in suggestions" :key="p.id" @click="pick(p)">
@@ -255,6 +296,28 @@ async function search() {
 .field input:disabled {
   background: #f1f5f9;
   color: #94a3b8;
+}
+.origin-row {
+  display: flex;
+  gap: 6px;
+}
+.origin-row input {
+  flex: 1;
+  min-width: 0;
+}
+.locate {
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.locate:disabled {
+  opacity: 0.6;
 }
 .segmented {
   display: flex;
