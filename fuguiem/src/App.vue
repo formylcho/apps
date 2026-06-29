@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import data from './data/iems.json'
 import { enrich, PRICE_BANDS, formatJpy } from './lib/iem.js'
 import IemCard from './components/IemCard.vue'
@@ -20,28 +20,32 @@ all.forEach((i) => (i.tags || []).forEach((t) => (tagCount[t] = (tagCount[t] || 
 const allTags = Object.keys(tagCount).sort((a, b) => tagCount[b] - tagCount[a])
 
 // --- 状態 ---
+// Vue 3 の reactive は Set のミューテーション(add/delete/has/size)を
+// そのまま追跡するため、フィルタ用の集合はここに集約する。
+// （ref を template から関数に渡すと自動アンラップで素の値になり扱いづらい）
 const q = ref('')
-const selBands = ref(new Set())
-const selTypes = ref(new Set())
-const selBrands = ref(new Set())
-const selSigs = ref(new Set())
-const selConnectors = ref(new Set())
-const selTags = ref(new Set())
 const sort = ref('price-asc')
+const sel = reactive({
+  bands: new Set(),
+  types: new Set(),
+  brands: new Set(),
+  sigs: new Set(),
+  connectors: new Set(),
+  tags: new Set(),
+})
 
-function toggle(set, val) {
-  const s = set.value
+function toggle(key, val) {
+  const s = sel[key]
   s.has(val) ? s.delete(val) : s.add(val)
-  set.value = new Set(s)
 }
 function clearAll() {
   q.value = ''
-  for (const s of [selBands, selTypes, selBrands, selSigs, selConnectors, selTags]) s.value = new Set()
+  for (const key of Object.keys(sel)) sel[key].clear()
 }
 
 const activeCount = computed(() =>
-  selBands.value.size + selTypes.value.size + selBrands.value.size +
-  selSigs.value.size + selConnectors.value.size + selTags.value.size +
+  sel.bands.size + sel.types.size + sel.brands.size +
+  sel.sigs.size + sel.connectors.size + sel.tags.size +
   (q.value.trim() ? 1 : 0)
 )
 
@@ -50,12 +54,12 @@ const filtered = computed(() => {
   const terms = q.value.trim().toLowerCase().split(/\s+/).filter(Boolean)
   let list = all.filter((i) => {
     if (terms.length && !terms.every((t) => i._haystack.includes(t))) return false
-    if (selBands.value.size && !selBands.value.has(i.band.id)) return false
-    if (selTypes.value.size && !selTypes.value.has(i.type)) return false
-    if (selBrands.value.size && !selBrands.value.has(i.brand)) return false
-    if (selSigs.value.size && !selSigs.value.has(i.signature)) return false
-    if (selConnectors.value.size && !selConnectors.value.has(i.connector)) return false
-    if (selTags.value.size && ![...selTags.value].every((t) => (i.tags || []).includes(t))) return false
+    if (sel.bands.size && !sel.bands.has(i.band.id)) return false
+    if (sel.types.size && !sel.types.has(i.type)) return false
+    if (sel.brands.size && !sel.brands.has(i.brand)) return false
+    if (sel.sigs.size && !sel.sigs.has(i.signature)) return false
+    if (sel.connectors.size && !sel.connectors.has(i.connector)) return false
+    if (sel.tags.size && ![...sel.tags].every((t) => (i.tags || []).includes(t))) return false
     return true
   })
   const cmp = {
@@ -92,7 +96,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       <div class="filter-block">
         <h2>価格帯</h2>
         <label v-for="b in PRICE_BANDS" :key="b.id" class="chk">
-          <input type="checkbox" :checked="selBands.has(b.id)" @change="toggle(selBands, b.id)" />
+          <input type="checkbox" :checked="sel.bands.has(b.id)" @change="toggle('bands', b.id)" />
           <span>{{ b.label }}</span><span class="cnt">{{ bandCount(b.id) }}</span>
         </label>
       </div>
@@ -100,7 +104,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       <div class="filter-block">
         <h2>ドライバ型式</h2>
         <label v-for="t in allTypes" :key="t" class="chk">
-          <input type="checkbox" :checked="selTypes.has(t)" @change="toggle(selTypes, t)" />
+          <input type="checkbox" :checked="sel.types.has(t)" @change="toggle('types', t)" />
           <span>{{ t }}</span>
         </label>
       </div>
@@ -108,7 +112,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       <div class="filter-block">
         <h2>音傾向</h2>
         <label v-for="s in allSignatures" :key="s" class="chk">
-          <input type="checkbox" :checked="selSigs.has(s)" @change="toggle(selSigs, s)" />
+          <input type="checkbox" :checked="sel.sigs.has(s)" @change="toggle('sigs', s)" />
           <span>{{ s }}</span>
         </label>
       </div>
@@ -117,7 +121,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
         <h2>特徴タグ</h2>
         <div class="tag-cloud">
           <button v-for="t in allTags" :key="t" class="tag-btn"
-            :class="{ on: selTags.has(t) }" @click="toggle(selTags, t)">
+            :class="{ on: sel.tags.has(t) }" @click="toggle('tags', t)">
             {{ t }}
           </button>
         </div>
@@ -126,7 +130,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       <div class="filter-block">
         <h2>ブランド</h2>
         <label v-for="b in allBrands" :key="b" class="chk">
-          <input type="checkbox" :checked="selBrands.has(b)" @change="toggle(selBrands, b)" />
+          <input type="checkbox" :checked="sel.brands.has(b)" @change="toggle('brands', b)" />
           <span>{{ b }}</span>
         </label>
       </div>
@@ -134,7 +138,7 @@ const bandCount = (id) => all.filter((i) => i.band.id === id).length
       <div class="filter-block">
         <h2>接続端子</h2>
         <label v-for="c in allConnectors" :key="c" class="chk">
-          <input type="checkbox" :checked="selConnectors.has(c)" @change="toggle(selConnectors, c)" />
+          <input type="checkbox" :checked="sel.connectors.has(c)" @change="toggle('connectors', c)" />
           <span>{{ c }}</span>
         </label>
       </div>
