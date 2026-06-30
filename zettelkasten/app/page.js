@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 // flat なメモ配列からツリー（ルート配列）を組み立てる
 function buildTrees(memos) {
@@ -29,6 +30,7 @@ function countNodes(node) {
 }
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [memos, setMemos] = useState(null);
   // view: compose | home | menu | all | tree | randomMemo
   const [view, setView] = useState("loading");
@@ -40,14 +42,15 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    const res = await fetch("/api/memos");
+    const res = await fetch("/api/memos", { cache: "no-store" });
     const data = await res.json();
     setMemos(data);
     return data;
   }, []);
 
-  // 初期ロード
+  // 初期ロード（ログイン済みのときだけ）
   useEffect(() => {
+    if (status !== "authenticated") return;
     load().then((data) => {
       if (data.length === 0) {
         setView("compose");
@@ -58,7 +61,7 @@ export default function Home() {
         setView("home");
       }
     });
-  }, [load]);
+  }, [load, status]);
 
   const trees = memos ? buildTrees(memos) : [];
   const treeById = (id) => trees.find((t) => t.id === id);
@@ -172,7 +175,12 @@ export default function Home() {
               <button
                 className="btn primary"
                 disabled={busy || !draft.trim()}
-                onClick={() => submitAppend(node.id, () => {})}
+                onClick={() =>
+                  submitAppend(
+                    node.id,
+                    view === "home" ? () => setView("menu") : undefined
+                  )
+                }
               >
                 追記する
               </button>
@@ -197,10 +205,57 @@ export default function Home() {
   function Topbar() {
     return (
       <div className="topbar">
-        <button className="brand" onClick={() => setView("menu")}>
-          ZETTELKASTEN
-        </button>
-        <span className="hint">考えを継ぎ足して育てる</span>
+        <span style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <button className="brand" onClick={() => setView("menu")}>
+            ZETTELKASTEN
+          </button>
+          <a className="navlink" href="/about">
+            このアプリについて
+          </a>
+        </span>
+        <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {session?.user && (
+            <span className="hint" title={session.user.email || ""}>
+              {session.user.name || session.user.email}
+            </span>
+          )}
+          <button className="navlink" onClick={() => signOut()}>
+            ログアウト
+          </button>
+        </span>
+      </div>
+    );
+  }
+
+  // 認証ゲート：未ログインならログイン画面、判定中はローディング
+  if (status === "loading") {
+    return (
+      <div className="wrap">
+        <div className="empty">読み込み中…</div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="wrap fade">
+        <div className="topbar">
+          <span className="brand">ZETTELKASTEN</span>
+          <a className="navlink" href="/about">
+            このアプリについて
+          </a>
+        </div>
+        <div style={{ textAlign: "center", padding: "80px 0" }}>
+          <h1 style={{ fontSize: 24, marginBottom: 12 }}>
+            考えを継ぎ足して育てるノート
+          </h1>
+          <p className="hint" style={{ marginBottom: 32 }}>
+            あなた専用の非公開ノートです。ログインして始めましょう。
+          </p>
+          <button className="btn primary" onClick={() => signIn("google")}>
+            Google でログイン
+          </button>
+        </div>
       </div>
     );
   }

@@ -29,6 +29,39 @@ body {
   min-height: 100vh;
 }
 
+/* モバイル調整 */
+@media (max-width: 560px) {
+  .wrap {
+    padding: 28px 18px 96px;
+  }
+  .topbar {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-bottom: 28px;
+  }
+  .topbar .hint {
+    display: none; /* 狭い画面ではキャッチコピーを省略 */
+  }
+  .brand {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+  }
+  .prose h1 {
+    font-size: 22px;
+  }
+  .prose h2 {
+    font-size: 17px;
+  }
+  .menu-card {
+    padding: 18px 18px;
+  }
+  /* タップ領域を確保 */
+  button.btn,
+  a.btn {
+    padding: 12px 20px;
+  }
+}
+
 .topbar {
   display: flex;
   align-items: baseline;
@@ -54,6 +87,69 @@ body {
 .hint {
   color: var(--muted);
   font-size: 13px;
+}
+
+.navlink {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.navlink:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* 説明ページ */
+.prose h1 {
+  font-size: 26px;
+  line-height: 1.5;
+  margin: 8px 0 24px;
+}
+
+.prose h2 {
+  font-size: 18px;
+  margin: 40px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose p {
+  font-size: 16px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.4em;
+}
+
+.prose li {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.prose code {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose .muted-note {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+a.btn {
+  display: inline-block;
+  text-decoration: none;
 }
 
 textarea.compose {
