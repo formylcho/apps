@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>読書ノート — 積み重ねの記録</title>
+<meta name="description" content="読んで、気づき、問う。学術書・論文のメモと疑問を残し、毎日の積み重ねを可視化する個人用ノート。">
+<meta name="theme-color" content="#4E7A38">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="読書ノート">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='104' fill='%234E7A38'/%3E%3Cpath d='M256 408 V250' stroke='%23F4F4EF' stroke-width='26' stroke-linecap='round'/%3E%3Cpath d='M256 306 C256 254 302 222 356 222 C356 274 310 306 256 306 Z' fill='%23CBD9BE'/%3E%3Cpath d='M256 264 C256 212 210 180 156 180 C156 232 202 264 256 264 Z' fill='%239FBB8C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='104' fill='%234E7A38'/%3E%3Cpath d='M256 408 V250' stroke='%23F4F4EF' stroke-width='26' stroke-linecap='round'/%3E%3Cpath d='M256 306 C256 254 302 222 356 222 C356 274 310 306 256 306 Z' fill='%23CBD9BE'/%3E%3Cpath d='M256 264 C256 212 210 180 156 180 C156 232 202 264 256 264 Z' fill='%239FBB8C'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#F4F4EF;
+    --panel:#FCFBF7;
+    --ink:#242A2E;
+    --ink-soft:#61686F;
+    --ink-faint:#8A9199;
+    --line:#E3E1D7;
+    --line-strong:#D2CFC2;
+    --g0:#E9E7DD; --g1:#CBD9BE; --g2:#9FBB8C; --g3:#6E9558; --g4:#456E30;
+    --green:#4E7A38; --green-deep:#3A5A29;
+    --amber:#A9741E; --amber-bg:#F3E8CF; --amber-line:#E4CE9E;
+    --serif:'Hiragino Mincho ProN','Hiragino Mincho Pro','Yu Mincho','YuMincho','Songti SC',serif;
+    --sans:'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','YuGothic','Meiryo',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;
+    -webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 0}
+  .wrap{max-width:1060px;margin:0 auto;padding:34px 22px 40px}
+  a{color:var(--green)}
+
+  .masthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    border-bottom:1px solid var(--line-strong);padding-bottom:16px}
+  .title{font-family:var(--serif);font-size:27px;font-weight:600;letter-spacing:.02em;margin:0}
+  .subtitle{color:var(--ink-soft);font-size:13px;margin:3px 0 0}
+  .tools{display:flex;gap:8px}
+  .ghost{background:none;border:1px solid var(--line-strong);color:var(--ink-soft);
+    font-family:var(--sans);font-size:12.5px;padding:6px 12px;border-radius:2px;cursor:pointer}
+  .ghost:hover{border-color:var(--ink-faint);color:var(--ink)}
+
+  .hero{margin-top:26px;background:var(--panel);border:1px solid var(--line);padding:24px 24px 18px;border-radius:3px}
+  .hero-top{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap}
+  .streak{display:flex;align-items:baseline;gap:9px}
+  .streak-num{font-family:var(--serif);font-size:58px;line-height:.9;font-weight:600;color:var(--green-deep)}
+  .streak-unit{font-family:var(--serif);font-size:19px;color:var(--ink-soft)}
+  .streak-label{font-size:12.5px;color:var(--ink-faint);margin-top:6px}
+  .metrics{display:flex;gap:26px;margin-left:auto}
+  .metric{text-align:right}
+  .metric b{font-family:var(--serif);font-size:24px;font-weight:600;display:block;line-height:1.1}
+  .metric span{font-size:11.5px;color:var(--ink-faint)}
+  .metric.open b{color:var(--amber)}
+
+  .today{margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--ink-soft);
+    border-top:1px dashed var(--line-strong);padding-top:15px}
+  .today .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--g1);border:1px solid var(--line-strong)}
+  .today.done .dot{background:var(--g3);border-color:var(--g4)}
+  .today.done{color:var(--green-deep)}
+
+  .heat-wrap{margin-top:20px;overflow-x:auto;padding-bottom:4px}
+  .heat{display:flex;gap:3px;min-width:min-content}
+  .heat-col{display:flex;flex-direction:column;gap:3px}
+  .heat-cell{width:14px;height:14px;border-radius:2px;background:var(--g0)}
+  .heat-cell.l1{background:var(--g1)} .heat-cell.l2{background:var(--g2)}
+  .heat-cell.l3{background:var(--g3)} .heat-cell.l4{background:var(--g4)}
+  .heat-cell.today{box-shadow:0 0 0 1.5px var(--ink)}
+  .heat-cell.empty{visibility:hidden}
+  .heat-months{display:flex;gap:3px;min-width:min-content;margin-bottom:5px;height:14px}
+  .heat-month{font-size:10.5px;color:var(--ink-faint);width:14px;white-space:nowrap;overflow:visible}
+  .legend{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--ink-faint);justify-content:flex-end}
+  .legend .heat-cell{width:11px;height:11px}
+
+  .capture{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:20px}
+  .seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:2px;overflow:hidden;margin-bottom:14px}
+  .seg button{background:none;border:none;border-right:1px solid var(--line-strong);
+    font-family:var(--sans);font-size:13px;color:var(--ink-soft);padding:6px 15px;cursor:pointer}
+  .seg button:last-child{border-right:none}
+  .seg button.on{background:var(--ink);color:var(--paper)}
+  .seg button.on[data-t="question"]{background:var(--amber);color:#fff}
+  .row2{display:flex;gap:12px;flex-wrap:wrap}
+  .field{flex:1;min-width:180px;margin-bottom:12px}
+  label.lab{display:block;font-size:11.5px;color:var(--ink-faint);margin-bottom:4px}
+  input.inp,textarea.inp{width:100%;font-family:var(--sans);font-size:14.5px;color:var(--ink);
+    background:#fff;border:1px solid var(--line-strong);border-radius:2px;padding:9px 11px;line-height:1.6}
+  textarea.inp{min-height:92px;resize:vertical}
+  .inp:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
+  .qhint{font-size:12px;color:var(--amber);margin:-4px 0 12px;display:none}
+  .capture.isq .qhint{display:block}
+  .cap-foot{display:flex;align-items:center;gap:12px;margin-top:4px;flex-wrap:wrap}
+  .primary{background:var(--green);color:#fff;border:none;font-family:var(--sans);font-size:14px;
+    padding:10px 22px;border-radius:2px;cursor:pointer;font-weight:600}
+  .primary:hover{background:var(--green-deep)}
+  .link-btn{background:none;border:none;color:var(--ink-soft);font-family:var(--sans);font-size:13px;
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .link-btn:hover{color:var(--ink)}
+  .cap-foot .spacer{margin-left:auto}
+
+  .filters{margin-top:30px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:14px}
+  .search{flex:1;min-width:200px}
+  .search input{width:100%;font-family:var(--sans);font-size:13.5px;background:transparent;
+    border:none;border-bottom:1px solid var(--line-strong);padding:6px 2px;color:var(--ink)}
+  .search input:focus{outline:none;border-bottom-color:var(--green)}
+  .fseg{display:inline-flex;gap:2px}
+  .fseg button{background:none;border:none;font-family:var(--sans);font-size:12.5px;color:var(--ink-faint);
+    padding:5px 9px;border-radius:2px;cursor:pointer}
+  .fseg button.on{color:var(--ink);background:var(--g0)}
+  .qonly{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;user-select:none}
+  .qonly input{accent-color:var(--amber)}
+
+  .stream{margin-top:8px}
+  .daygroup{margin-top:22px}
+  .dayhead{font-family:var(--serif);font-size:14px;color:var(--ink-soft);border-bottom:1px dotted var(--line-strong);
+    padding-bottom:5px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline}
+  .dayhead .n{font-family:var(--sans);font-size:11px;color:var(--ink-faint)}
+  .note{position:relative;padding:13px 15px 13px 17px;background:var(--panel);border:1px solid var(--line);
+    border-radius:3px;margin-bottom:9px}
+  .note.q{border-left:3px solid var(--amber-line);background:#FCFAF4}
+  .note.log{background:transparent;border-style:dashed;color:var(--ink-soft)}
+  .note-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}
+  .badge{font-size:11px;padding:1.5px 8px;border-radius:2px;background:var(--g0);color:var(--ink-soft);flex:none}
+  .badge.q{background:var(--amber-bg);color:var(--amber)}
+  .badge.insight{background:#E4EBDC;color:var(--green-deep)}
+  .src{font-size:12.5px;color:var(--ink-soft)}
+  .src b{color:var(--ink);font-weight:600}
+  .note-body{white-space:pre-wrap;font-size:14.5px;word-break:break-word}
+  .tags{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+  .tag{font-size:11px;color:var(--ink-faint);background:var(--g0);padding:1px 8px;border-radius:2px}
+  .qstatus{cursor:pointer;border:1px solid;font-size:11px;padding:1.5px 9px;border-radius:2px;background:none;font-family:var(--sans)}
+  .qs-open{color:var(--amber);border-color:var(--amber);background:var(--amber-bg)}
+  .qs-resolved{color:var(--green-deep);border-color:var(--g3)}
+  .qs-sent{color:var(--ink-soft);border-color:var(--line-strong)}
+  .note-acts{position:absolute;top:11px;right:11px;display:flex;gap:8px;opacity:0;transition:opacity .12s}
+  .note:hover .note-acts,.note:focus-within .note-acts{opacity:1}
+  .note-acts button{background:none;border:none;color:var(--ink-faint);font-size:12px;cursor:pointer;padding:2px 4px;font-family:var(--sans)}
+  .note-acts button:hover{color:var(--ink)}
+
+  .empty{margin-top:36px;text-align:center;color:var(--ink-faint);font-size:14px;line-height:1.9}
+  .empty .em-serif{font-family:var(--serif);font-size:17px;color:var(--ink-soft);display:block;margin-bottom:6px}
+
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--ink-faint);line-height:1.8}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--paper);font-size:13px;padding:9px 18px;border-radius:3px;opacity:0;
+    transition:opacity .2s,transform .2s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .notice{background:var(--amber-bg);border:1px solid var(--amber-line);color:var(--amber);
+    font-size:12.5px;padding:8px 14px;border-radius:3px;margin-top:16px;display:none}
+
+  @media (max-width:560px){
+    .wrap{padding:26px 16px 40px}
+    .streak-num{font-size:46px}
+    .metrics{margin-left:0;width:100%;justify-content:flex-start;gap:22px}
+    .metric{text-align:left}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <h1 class="title">読書ノート</h1>
+      <p class="subtitle">読んで、気づき、問う。その積み重ねを一日ずつ。</p>
+    </div>
+    <div class="tools">
+      <button class="ghost" id="exportBtn">書き出す</button>
+      <button class="ghost" id="importBtn">読み込む</button>
+      <input type="file" id="importFile" accept="application/json" hidden>
+    </div>
+  </header>
+
+  <div class="notice" id="storageNotice">このブラウザでは記録を保存できません（プライベートモードなどの可能性）。今回開いている間だけ保持します。大切な記録は「書き出す」でバックアップしてください。</div>
+
+  <section class="hero" aria-label="積み重ね">
+    <div class="hero-top">
+      <div>
+        <div class="streak">
+          <span class="streak-num" id="streakNum">0</span>
+          <span class="streak-unit">日</span>
+        </div>
+        <div class="streak-label" id="streakLabel">連続で記録した日数</div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><b id="mTotal">0</b><span>これまでのメモ</span></div>
+        <div class="metric open"><b id="mOpen">0</b><span>未解決の問い</span></div>
+        <div class="metric"><b id="mDays">0</b><span>記録した日</span></div>
+      </div>
+    </div>
+
+    <div class="today" id="todayRow">
+      <span class="dot"></span>
+      <span id="todayText">今日の一歩はまだ。要点でも、引っかかった一文でもいい。</span>
+    </div>
+
+    <div class="heat-wrap">
+      <div class="heat-months" id="heatMonths"></div>
+      <div class="heat" id="heat"></div>
+    </div>
+    <div class="legend">
+      <span>少</span>
+      <span class="heat-cell"></span><span class="heat-cell l1"></span>
+      <span class="heat-cell l2"></span><span class="heat-cell l3"></span><span class="heat-cell l4"></span>
+      <span>多</span>
+    </div>
+  </section>
+
+  <section class="capture" id="capture">
+    <div class="seg" id="typeSeg" role="tablist" aria-label="種類">
+      <button data-t="summary" role="tab">要約</button>
+      <button data-t="insight" role="tab">気づき</button>
+      <button data-t="question" role="tab">疑問</button>
+    </div>
+    <div class="row2">
+      <div class="field"><label class="lab">出典（書名・論文名）</label>
+        <input class="inp" id="fSource" placeholder="例）計算論的精神医学（勁草書房）"></div>
+      <div class="field"><label class="lab">著者</label>
+        <input class="inp" id="fAuthor" placeholder="例）国里・片平・沖村・山下"></div>
+    </div>
+    <div class="field"><label class="lab" id="bodyLab">本文</label>
+      <textarea class="inp" id="fBody" placeholder="要点、引用、気づいたこと。短くていい。"></textarea></div>
+    <p class="qhint">この問いは、いつか著者に送れる一問になるかもしれません。「読んだからこそ出てくる問い」を、そのまま残しておきましょう。</p>
+    <div class="field"><label class="lab">タグ（スペース区切り・任意）</label>
+      <input class="inp" id="fTags" placeholder="強化学習 ベイズ 第3章"></div>
+    <div class="cap-foot">
+      <button class="primary" id="addBtn">書きとめる</button>
+      <button class="link-btn" id="cancelEdit" style="display:none">編集をやめる</button>
+      <div class="spacer"></div>
+      <button class="link-btn" id="logBtn">今日は読んだ記録だけ残す</button>
+    </div>
+  </section>
+
+  <div class="filters">
+    <div class="search"><input id="searchInp" placeholder="本文・出典・タグを検索" aria-label="検索"></div>
+    <div class="fseg" id="filterSeg">
+      <button data-f="all" class="on">すべて</button>
+      <button data-f="summary">要約</button>
+      <button data-f="insight">気づき</button>
+      <button data-f="question">疑問</button>
+    </div>
+    <label class="qonly"><input type="checkbox" id="qOnly">未解決の問いだけ</label>
+  </div>
+
+  <div class="stream" id="stream"></div>
+
+  <footer>
+    記録はこの端末のブラウザ内に保存されます。別の端末やブラウザとは自動同期されないため、移すときは「書き出す」→「読み込む」を使ってください。<br>
+    ホーム画面に追加すると、アプリのように開けます。
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const KEY="reading-notebook-v1";
+let state={notes:[]};
+let editingId=null, currentType="summary", filterType="all", qOnly=false, searchQ="", memoryOnly=false;
+
+const pad=n=>String(n).padStart(2,"0");
+const fmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const todayStr=()=>fmt(new Date());
+function parseDay(s){const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c);}
+const WD=["日","月","火","水","木","金","土"];
+const MON=["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"];
+function prettyDay(s){const d=parseDay(s);const t=todayStr();
+  if(s===t)return "今日";
+  const y=new Date();y.setDate(y.getDate()-1);
+  if(s===fmt(y))return "昨日";
+  return (d.getMonth()+1)+"月"+d.getDate()+"日（"+WD[d.getDay()]+"）";}
+
+function storageOK(){try{const k="__t";localStorage.setItem(k,"1");localStorage.removeItem(k);return true;}catch(e){return false;}}
+function load(){
+  if(!storageOK()){memoryOnly=true;document.getElementById("storageNotice").style.display="block";return;}
+  try{const raw=localStorage.getItem(KEY);
+    if(raw){const d=JSON.parse(raw);if(d&&Array.isArray(d.notes))state=d;}
+  }catch(e){/* corrupt: keep fresh state, don't overwrite until next save */}
+  if(!state.notes)state.notes=[];
+}
+function save(){
+  if(memoryOnly)return;
+  try{localStorage.setItem(KEY,JSON.stringify(state));}
+  catch(e){memoryOnly=true;document.getElementById("storageNotice").style.display="block";}
+}
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function addNote(){
+  const source=document.getElementById("fSource").value.trim();
+  const author=document.getElementById("fAuthor").value.trim();
+  const body=document.getElementById("fBody").value.trim();
+  const tags=document.getElementById("fTags").value.trim().split(/[\s,、]+/).filter(Boolean);
+  if(!body){toast("本文を書いてください");document.getElementById("fBody").focus();return;}
+  if(editingId){
+    const n=state.notes.find(x=>x.id===editingId);
+    if(n){n.source=source;n.author=author;n.body=body;n.tags=tags;n.type=currentType;
+      if(currentType==="question"&&!n.qstatus)n.qstatus="open";
+      if(currentType!=="question")delete n.qstatus;}
+    toast("更新しました");
+  }else{
+    const n={id:uid(),day:todayStr(),createdAt:new Date().toISOString(),type:currentType,source,author,body,tags};
+    if(currentType==="question")n.qstatus="open";
+    state.notes.push(n);
+    toast(currentType==="question"?"問いを残しました":"書きとめました");
+  }
+  save();clearForm();render();
+}
+function addLog(){
+  state.notes.push({id:uid(),day:todayStr(),createdAt:new Date().toISOString(),type:"log",source:"",author:"",body:"",tags:[]});
+  save();render();toast("今日の一歩を記録しました");
+}
+function delNote(id){
+  const n=state.notes.find(x=>x.id===id);
+  if(!confirm(n&&n.type==="log"?"この記録を消しますか？":"このメモを消しますか？"))return;
+  state.notes=state.notes.filter(x=>x.id!==id);
+  if(editingId===id){editingId=null;clearForm();}
+  save();render();
+}
+function cycleStatus(id){
+  const n=state.notes.find(x=>x.id===id);if(!n)return;
+  const order=["open","resolved","sent"];
+  n.qstatus=order[(order.indexOf(n.qstatus)+1)%3];
+  save();render();
+}
+function startEdit(id){
+  const n=state.notes.find(x=>x.id===id);if(!n)return;
+  editingId=id;setType(n.type==="log"?"summary":n.type);
+  document.getElementById("fSource").value=n.source||"";
+  document.getElementById("fAuthor").value=n.author||"";
+  document.getElementById("fBody").value=n.body||"";
+  document.getElementById("fTags").value=(n.tags||[]).join(" ");
+  document.getElementById("addBtn").textContent="更新する";
+  document.getElementById("cancelEdit").style.display="inline";
+  document.getElementById("capture").scrollIntoView({behavior:"smooth",block:"center"});
+  document.getElementById("fBody").focus();
+}
+function clearForm(){
+  ["fSource","fAuthor","fBody","fTags"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("addBtn").textContent="書きとめる";
+  document.getElementById("cancelEdit").style.display="none";
+  editingId=null;
+}
+
+function setType(t){
+  currentType=t;
+  document.querySelectorAll("#typeSeg button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+  document.getElementById("capture").classList.toggle("isq",t==="question");
+  document.getElementById("bodyLab").textContent=t==="question"?"問い":"本文";
+  const ph={summary:"要点、引用、章のまとめ。短くていい。",
+    insight:"読んで自分の中に立ち上がった考え。",
+    question:"読んだからこそ出てきた問い。式のここが、なぜこうなのか——など。"};
+  document.getElementById("fBody").placeholder=ph[t];
+}
+
+function dayCounts(){const m={};state.notes.forEach(n=>{m[n.day]=(m[n.day]||0)+1;});return m;}
+function computeStreak(daySet){
+  let s=0,d=new Date();
+  if(!daySet.has(fmt(d)))d.setDate(d.getDate()-1);
+  while(daySet.has(fmt(d))){s++;d.setDate(d.getDate()-1);}
+  return s;
+}
+
+function render(){
+  const counts=dayCounts();
+  const daySet=new Set(Object.keys(counts));
+  const activeToday=!!counts[todayStr()];
+  const streak=computeStreak(daySet);
+  document.getElementById("streakNum").textContent=streak;
+  const openQ=state.notes.filter(n=>n.type==="question"&&n.qstatus==="open").length;
+  document.getElementById("mTotal").textContent=state.notes.filter(n=>n.type!=="log").length;
+  document.getElementById("mOpen").textContent=openQ;
+  document.getElementById("mDays").textContent=daySet.size;
+
+  const tr=document.getElementById("todayRow"),tt=document.getElementById("todayText"),sl=document.getElementById("streakLabel");
+  if(activeToday){tr.classList.add("done");
+    tt.textContent="今日も積み上げた。この一日が、振り返ったときの自分を支えます。";
+    sl.textContent="連続で記録した日数";}
+  else{tr.classList.remove("done");
+    tt.textContent=streak>0?"今日記録すれば "+(streak+1)+" 日目。まだ途切れていません。":"今日の一歩はまだ。要点でも、引っかかった一文でもいい。";
+    sl.textContent=streak>0?"昨日までの連続日数":"連続で記録した日数";}
+
+  renderHeatmap(counts);
+  renderStream(counts);
+}
+
+function renderHeatmap(counts){
+  const heat=document.getElementById("heat"),months=document.getElementById("heatMonths");
+  heat.innerHTML="";months.innerHTML="";
+  const WEEKS=18;
+  const today=new Date();today.setHours(0,0,0,0);
+  const start=new Date(today);
+  start.setDate(start.getDate()-today.getDay()-(WEEKS-1)*7);
+  const max=Math.max(1,...Object.values(counts));
+  let lastMonth=-1;
+  for(let w=0;w<WEEKS;w++){
+    const col=document.createElement("div");col.className="heat-col";
+    const first=new Date(start);first.setDate(first.getDate()+w*7);
+    const mLbl=document.createElement("div");mLbl.className="heat-month";
+    if(first.getMonth()!==lastMonth){mLbl.textContent=MON[first.getMonth()];lastMonth=first.getMonth();}
+    months.appendChild(mLbl);
+    for(let d=0;d<7;d++){
+      const cur=new Date(start);cur.setDate(cur.getDate()+w*7+d);
+      const cell=document.createElement("div");cell.className="heat-cell";
+      if(cur>today){cell.classList.add("empty");}
+      else{
+        const key=fmt(cur),c=counts[key]||0;
+        let lvl=0;
+        if(c>0)lvl=c>=4?4:(c>=3?3:(c>=2?2:1));
+        if(c>0&&max<4)lvl=Math.min(4,Math.ceil((c/max)*4));
+        if(lvl)cell.classList.add("l"+lvl);
+        if(key===todayStr())cell.classList.add("today");
+        cell.title=(cur.getMonth()+1)+"月"+cur.getDate()+"日 ・ "+(c?c+"件":"記録なし");
+      }
+      col.appendChild(cell);
+    }
+    heat.appendChild(col);
+  }
+}
+
+function matchNote(n){
+  if(qOnly&&!(n.type==="question"&&n.qstatus==="open"))return false;
+  if(filterType!=="all"){if(n.type!==filterType)return false;}
+  else if(n.type==="log"&&(searchQ||qOnly))return false;
+  if(searchQ){
+    const hay=((n.body||"")+" "+(n.source||"")+" "+(n.author||"")+" "+(n.tags||[]).join(" ")).toLowerCase();
+    if(!hay.includes(searchQ.toLowerCase()))return false;
+  }
+  return true;
+}
+
+const TYPE_LABEL={summary:"要約",insight:"気づき",question:"疑問",log:"読書ログ"};
+const QS_LABEL={open:"未解決",resolved:"解決",sent:"著者に送った"};
+
+function renderStream(counts){
+  const stream=document.getElementById("stream");
+  const notes=state.notes.filter(matchNote).sort((a,b)=>b.createdAt<a.createdAt?-1:1);
+  if(notes.length===0){
+    stream.innerHTML='<div class="empty"><span class="em-serif">'+
+      (state.notes.length?"この条件に合うメモはありません。":"まだ何もありません。")+'</span>'+
+      (state.notes.length?"検索や絞り込みを変えてみてください。":
+        "最初の一つを書きましょう。完璧でなくていい。読んで引っかかった一文で十分です。")+'</div>';
+    return;
+  }
+  const groups={};
+  notes.forEach(n=>{(groups[n.day]=groups[n.day]||[]).push(n);});
+  const days=Object.keys(groups).sort((a,b)=>a<b?1:-1);
+  let html="";
+  days.forEach(day=>{
+    const c=counts[day]||groups[day].length;
+    html+='<div class="daygroup"><div class="dayhead">'+prettyDay(day)+'<span class="n">'+c+' 件</span></div>';
+    groups[day].forEach(n=>{html+=noteHTML(n);});
+    html+='</div>';
+  });
+  stream.innerHTML=html;
+  stream.querySelectorAll("[data-act]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      const id=el.dataset.id,act=el.dataset.act;
+      if(act==="del")delNote(id);
+      else if(act==="edit")startEdit(id);
+      else if(act==="status")cycleStatus(id);
+    });
+  });
+}
+
+function esc(s){return (s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));}
+function noteHTML(n){
+  if(n.type==="log"){
+    return '<div class="note log"><div class="note-head"><span class="badge">読書ログ</span>'+
+      '<span class="src">今日の一歩</span></div>'+
+      '<div class="note-acts"><button data-act="del" data-id="'+n.id+'">消す</button></div></div>';
+  }
+  const bcl=n.type==="question"?"badge q":(n.type==="insight"?"badge insight":"badge");
+  const src=(n.source||n.author)?
+    '<span class="src">'+(n.source?'<b>'+esc(n.source)+'</b>':"")+
+    (n.author?(n.source?" — ":"")+esc(n.author):"")+'</span>':"";
+  let status="";
+  if(n.type==="question"){
+    const cls={open:"qs-open",resolved:"qs-resolved",sent:"qs-sent"}[n.qstatus||"open"];
+    status='<button class="qstatus '+cls+'" data-act="status" data-id="'+n.id+'" title="クリックで状態を切り替え">'+QS_LABEL[n.qstatus||"open"]+'</button>';
+  }
+  const tags=(n.tags&&n.tags.length)?'<div class="tags">'+n.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join("")+'</div>':"";
+  return '<div class="note'+(n.type==="question"?" q":"")+'">'+
+    '<div class="note-head"><span class="'+bcl+'">'+TYPE_LABEL[n.type]+'</span>'+src+status+'</div>'+
+    '<div class="note-body">'+esc(n.body)+'</div>'+tags+
+    '<div class="note-acts"><button data-act="edit" data-id="'+n.id+'">編集</button>'+
+    '<button data-act="del" data-id="'+n.id+'">消す</button></div></div>';
+}
+
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800);}
+
+document.querySelectorAll("#typeSeg button").forEach(b=>b.addEventListener("click",()=>setType(b.dataset.t)));
+document.getElementById("addBtn").addEventListener("click",addNote);
+document.getElementById("logBtn").addEventListener("click",addLog);
+document.getElementById("cancelEdit").addEventListener("click",clearForm);
+document.getElementById("fBody").addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key==="Enter")addNote();});
+document.querySelectorAll("#filterSeg button").forEach(b=>b.addEventListener("click",()=>{
+  filterType=b.dataset.f;
+  document.querySelectorAll("#filterSeg button").forEach(x=>x.classList.toggle("on",x===b));
+  render();
+}));
+document.getElementById("qOnly").addEventListener("change",e=>{qOnly=e.target.checked;render();});
+document.getElementById("searchInp").addEventListener("input",e=>{searchQ=e.target.value.trim();render();});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="reading-notebook-"+todayStr()+".json";a.click();URL.revokeObjectURL(a.href);
+});
+document.getElementById("importBtn").addEventListener("click",()=>document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const data=JSON.parse(r.result);
+    if(!data.notes||!Array.isArray(data.notes))throw new Error("形式が違います");
+    if(!confirm("現在の記録を、読み込んだ内容で置き換えますか？（先に「書き出す」でバックアップを推奨）"))return;
+    state=data;if(!state.notes)state.notes=[];save();render();toast("読み込みました");
+  }catch(err){toast("読み込めませんでした："+err.message);}};
+  r.readAsText(f);e.target.value="";
+});
+
+load();setType("summary");render();
+</script>
+</body>
+</html>
