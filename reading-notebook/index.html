@@ -28,8 +28,10 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.7;
-    -webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) 0 0}
+    -webkit-font-smoothing:antialiased;overflow-wrap:break-word;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
   .wrap{max-width:1060px;margin:0 auto;padding:34px 22px 40px}
   a{color:var(--green)}
 
@@ -143,7 +145,8 @@
 
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;font-size:12px;color:var(--ink-faint);line-height:1.8}
 
-  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  .toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));
+    max-width:calc(100vw - 32px);text-align:center;transform:translateX(-50%) translateY(20px);
     background:var(--ink);color:var(--paper);font-size:13px;padding:9px 18px;border-radius:3px;opacity:0;
     transition:opacity .2s,transform .2s;pointer-events:none;z-index:50}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -155,6 +158,31 @@
     .streak-num{font-size:46px}
     .metrics{margin-left:0;width:100%;justify-content:flex-start;gap:22px}
     .metric{text-align:left}
+    .masthead{align-items:flex-start}
+    .tools{width:100%}
+    .tools .ghost{flex:1}
+    .hero{padding:20px 16px 16px}
+    .capture{padding:16px}
+    .seg{display:flex;width:100%}
+    .seg button{flex:1;padding:9px 6px}
+    .today{align-items:flex-start}
+    .today .dot{margin-top:7px}
+    .cap-foot{gap:10px}
+    .cap-foot .primary{width:100%;padding:13px 22px}
+    .cap-foot .spacer{display:none}
+    .filters{gap:10px}
+    .fseg{width:100%}
+    .fseg button{flex:1;padding:8px 4px}
+    footer{margin-top:32px}
+  }
+  /* タッチ端末：hover が無いので操作を常時見せ、標的を指のサイズにする */
+  @media (pointer:coarse){
+    .note-acts{position:static;opacity:1;margin-top:9px;padding-top:8px;gap:4px;
+      justify-content:flex-end;border-top:1px dotted var(--line)}
+    .note-acts button{padding:8px 14px;font-size:13px;min-height:40px}
+    .qstatus{padding:6px 11px;font-size:12px}
+    /* iOS Safari は 16px 未満の入力欄でフォーカス時に自動ズームする */
+    input.inp,textarea.inp,.search input{font-size:16px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
