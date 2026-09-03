@@ -1,0 +1,101 @@
+[
+  {
+    "slug": "fujitsu",
+    "name": "富士通クライアントコンピューティング",
+    "brand": "FMV",
+    "origin": "国内",
+    "oneLine": "世界最軽量級のモバイルノートを軸に、携帯性へ全振りしたラインを持つ。",
+    "series": ["LIFEBOOK UH", "LIFEBOOK WU", "LIFEBOOK AH", "FMV Zero"],
+    "status": "planned"
+  },
+  {
+    "slug": "nec",
+    "name": "NECパーソナルコンピュータ",
+    "brand": "LAVIE",
+    "origin": "国内",
+    "oneLine": "量販店での取り扱いが厚く、軽量モバイルから大画面の家庭用まで幅が広い。",
+    "series": ["LAVIE NEXTREME Carbon", "LAVIE N15", "LAVIE Direct"],
+    "status": "planned"
+  },
+  {
+    "slug": "dynabook",
+    "name": "Dynabook",
+    "brand": "dynabook",
+    "origin": "国内",
+    "oneLine": "キーボードと放熱設計に強みを置き、法人向けの実績が厚い。",
+    "series": ["dynabook R", "dynabook G", "dynabook X"],
+    "status": "planned"
+  },
+  {
+    "slug": "panasonic",
+    "name": "パナソニック",
+    "brand": "Let's note",
+    "origin": "国内",
+    "oneLine": "堅牢性とバッテリー駆動時間に振り切った、モバイルワーク向けの独自路線。",
+    "series": ["Let's note SR", "Let's note FV", "Let's note SV"],
+    "status": "planned"
+  },
+  {
+    "slug": "vaio",
+    "name": "VAIO",
+    "brand": "VAIO",
+    "origin": "国内",
+    "oneLine": "安曇野の自社工場での品質管理を掲げ、筐体設計に特色がある。",
+    "series": ["VAIO SX14", "VAIO SX12", "VAIO F"],
+    "status": "planned"
+  },
+  {
+    "slug": "lenovo",
+    "name": "Lenovo",
+    "brand": "ThinkPad / IdeaPad / Yoga",
+    "origin": "海外",
+    "oneLine": "ThinkPadの入力デバイスと保守性を筆頭に、価格帯ごとにブランドを分けている。",
+    "series": ["ThinkPad X1", "ThinkPad T", "Yoga", "IdeaPad"],
+    "status": "planned"
+  },
+  {
+    "slug": "hp",
+    "name": "HP",
+    "brand": "HP",
+    "origin": "海外",
+    "oneLine": "デザイン性の高い個人向けと、管理機能を備えた法人向けでラインが分かれる。",
+    "series": ["Spectre", "Envy", "Pavilion", "EliteBook"],
+    "status": "planned"
+  },
+  {
+    "slug": "dell",
+    "name": "Dell",
+    "brand": "Dell / Alienware",
+    "origin": "海外",
+    "oneLine": "直販カスタマイズが軸。ゲーミングは別ブランドとして独立している。",
+    "series": ["XPS", "Inspiron", "Latitude", "Alienware"],
+    "status": "planned"
+  },
+  {
+    "slug": "asus",
+    "name": "ASUS",
+    "brand": "ASUS / ROG",
+    "origin": "海外",
+    "oneLine": "有機ELディスプレイの採用が早く、価格帯あたりの構成が厚い。",
+    "series": ["Zenbook", "Vivobook", "ROG", "ProArt"],
+    "status": "planned"
+  },
+  {
+    "slug": "apple",
+    "name": "Apple",
+    "brand": "MacBook",
+    "origin": "海外",
+    "oneLine": "自社設計SoCとOSの統合により、電力効率の考え方が他社と根本的に異なる。",
+    "series": ["MacBook Air", "MacBook Pro"],
+    "status": "planned"
+  },
+  {
+    "slug": "microsoft",
+    "name": "Microsoft",
+    "brand": "Surface",
+    "origin": "海外",
+    "oneLine": "Windowsの標準機を自ら示す位置づけで、2in1の形態を早くから展開。",
+    "series": ["Surface Laptop", "Surface Pro"],
+    "status": "planned"
+  }
+]

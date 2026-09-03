@@ -1,0 +1,33 @@
+{
+  "segments": [
+    {
+      "slug": "form-factor",
+      "title": "形態の違い（クラムシェル / 2in1 / デタッチャブル）",
+      "oneLine": "画面とキーボードの繋がり方で、使える姿勢と重量・剛性のトレードオフが決まる。",
+      "items": ["クラムシェル", "2in1コンバーチブル", "デタッチャブル"],
+      "status": "planned"
+    },
+    {
+      "slug": "usage",
+      "title": "用途区分（モバイル / スタンダード / クリエイター / ゲーミング）",
+      "oneLine": "同じ「ノートPC」でも、重量・GPU・冷却のどれに予算を割いたかで別物になる。",
+      "items": ["モバイル", "スタンダード", "クリエイター", "ゲーミング"],
+      "status": "planned"
+    },
+    {
+      "slug": "retail-model",
+      "title": "店頭モデル / 直販カスタマイズ / 法人モデルの違い",
+      "oneLine": "同じシリーズでも売られ方で型番・構成・付属ソフトが変わる、最も誤解が多い区分。",
+      "items": ["店頭モデル", "直販カスタマイズ", "法人モデル"],
+      "status": "planned"
+    }
+  ],
+  "specs": [
+    { "slug": "cpu", "title": "CPUの世代マップ", "oneLine": "型番の数字を読めるようにする。世代・グレード・消費電力枠の3つで位置が決まる。", "status": "planned" },
+    { "slug": "display", "title": "ディスプレイ（パネル方式・解像度・輝度）", "oneLine": "IPSと有機ELの違い、解像度と作業領域、光沢/非光沢の使い分け。", "status": "planned" },
+    { "slug": "memory-storage", "title": "メモリとストレージ", "oneLine": "オンボードかSO-DIMMかで、後から増やせるかどうかが決まる。", "status": "planned" },
+    { "slug": "battery", "title": "バッテリーと駆動時間", "oneLine": "公称値の測定規格（JEITA 3.0）を知らないと、数字を比べても意味がない。", "status": "planned" },
+    { "slug": "chassis", "title": "筐体・重量・堅牢性", "oneLine": "軽さは素材と構造で買うもの。堅牢性試験の種類も含めて読む。", "status": "planned" },
+    { "slug": "ports", "title": "インターフェース", "oneLine": "USB Type-Cは形が同じでも中身が違う。給電・映像出力・転送速度を分けて見る。", "status": "planned" }
+  ]
+}

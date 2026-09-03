@@ -1,0 +1,88 @@
+{
+  "type": "pc",
+  "version": "0.1.0",
+  "note": "比較表のヘッダー・並び順・差分ハイライトはこの定義から自動生成する。数値は正規化した単位で保持し、表示整形はUI側で行う。",
+  "groups": [
+    {
+      "key": "basic",
+      "label": "基本",
+      "fields": [
+        { "key": "model", "label": "型番", "unit": null, "kind": "text" },
+        { "key": "release", "label": "発売時期", "unit": null, "kind": "yearmonth", "higher_is_better": true },
+        { "key": "os", "label": "OS", "unit": null, "kind": "text" },
+        { "key": "retail_model", "label": "販売形態", "unit": null, "kind": "enum", "enum": ["店頭モデル", "直販カスタマイズ", "法人モデル"], "learn": "retail-model" }
+      ]
+    },
+    {
+      "key": "performance",
+      "label": "性能",
+      "fields": [
+        { "key": "cpu_name", "label": "CPU", "unit": null, "kind": "text", "learn": "cpu" },
+        { "key": "cpu_cores", "label": "コア数", "unit": null, "kind": "number", "higher_is_better": true },
+        { "key": "cpu_tdp_w", "label": "基本電力", "unit": "W", "kind": "number", "higher_is_better": null },
+        { "key": "npu_tops", "label": "NPU性能", "unit": "TOPS", "kind": "number", "higher_is_better": true },
+        { "key": "gpu_name", "label": "GPU", "unit": null, "kind": "text" },
+        { "key": "memory_gb", "label": "メモリ", "unit": "GB", "kind": "number", "higher_is_better": true, "learn": "memory-storage" },
+        { "key": "memory_upgradable", "label": "メモリ増設", "unit": null, "kind": "bool", "higher_is_better": true, "learn": "memory-storage" },
+        { "key": "storage_gb", "label": "ストレージ", "unit": "GB", "kind": "number", "higher_is_better": true }
+      ]
+    },
+    {
+      "key": "display",
+      "label": "ディスプレイ",
+      "fields": [
+        { "key": "screen_inch", "label": "画面サイズ", "unit": "型", "kind": "number", "higher_is_better": null, "learn": "display" },
+        { "key": "resolution", "label": "解像度", "unit": null, "kind": "text", "learn": "display" },
+        { "key": "panel_type", "label": "パネル方式", "unit": null, "kind": "enum", "enum": ["IPS", "OLED", "TN", "VA"], "learn": "display" },
+        { "key": "refresh_hz", "label": "リフレッシュレート", "unit": "Hz", "kind": "number", "higher_is_better": true },
+        { "key": "brightness_nit", "label": "輝度", "unit": "nit", "kind": "number", "higher_is_better": true },
+        { "key": "surface", "label": "表面処理", "unit": null, "kind": "enum", "enum": ["光沢", "非光沢"] },
+        { "key": "touch", "label": "タッチ対応", "unit": null, "kind": "bool", "higher_is_better": true }
+      ]
+    },
+    {
+      "key": "body",
+      "label": "サイズ・電源",
+      "fields": [
+        { "key": "weight_g", "label": "質量", "unit": "g", "kind": "number", "higher_is_better": false, "learn": "chassis" },
+        { "key": "width_mm", "label": "幅", "unit": "mm", "kind": "number", "higher_is_better": false },
+        { "key": "depth_mm", "label": "奥行", "unit": "mm", "kind": "number", "higher_is_better": false },
+        { "key": "height_mm", "label": "厚さ", "unit": "mm", "kind": "number", "higher_is_better": false },
+        { "key": "battery_wh", "label": "バッテリー容量", "unit": "Wh", "kind": "number", "higher_is_better": true, "learn": "battery" },
+        { "key": "battery_hours_jeita3_idle", "label": "駆動時間 (JEITA3.0 アイドル)", "unit": "時間", "kind": "number", "higher_is_better": true, "learn": "battery" },
+        { "key": "battery_hours_jeita3_load", "label": "駆動時間 (JEITA3.0 動画再生)", "unit": "時間", "kind": "number", "higher_is_better": true, "learn": "battery" },
+        { "key": "chassis_material", "label": "筐体素材", "unit": null, "kind": "text", "learn": "chassis" }
+      ]
+    },
+    {
+      "key": "interface",
+      "label": "インターフェース",
+      "fields": [
+        { "key": "usb_c_count", "label": "USB Type-C", "unit": "基", "kind": "number", "higher_is_better": true, "learn": "ports" },
+        { "key": "usb_a_count", "label": "USB Type-A", "unit": "基", "kind": "number", "higher_is_better": true, "learn": "ports" },
+        { "key": "hdmi", "label": "HDMI", "unit": null, "kind": "bool", "higher_is_better": true },
+        { "key": "lan", "label": "有線LAN", "unit": null, "kind": "bool", "higher_is_better": true },
+        { "key": "sd_slot", "label": "SDカードスロット", "unit": null, "kind": "text" },
+        { "key": "wireless", "label": "無線", "unit": null, "kind": "text" }
+      ]
+    },
+    {
+      "key": "other",
+      "label": "その他",
+      "fields": [
+        { "key": "camera", "label": "カメラ", "unit": null, "kind": "text" },
+        { "key": "biometrics", "label": "生体認証", "unit": null, "kind": "text" },
+        { "key": "keyboard_pitch_mm", "label": "キーピッチ", "unit": "mm", "kind": "number", "higher_is_better": null },
+        { "key": "keyboard_stroke_mm", "label": "キーストローク", "unit": "mm", "kind": "number", "higher_is_better": null },
+        { "key": "durability", "label": "堅牢性試験", "unit": null, "kind": "text", "learn": "chassis" },
+        { "key": "warranty_years", "label": "保証", "unit": "年", "kind": "number", "higher_is_better": true }
+      ]
+    }
+  ],
+  "tags": {
+    "form-factor": ["clamshell", "convertible", "detachable"],
+    "usage": ["mobile", "standard", "creator", "gaming"],
+    "size": ["11-12inch", "13inch", "14inch", "15inch", "16inch-over"],
+    "weight": ["under-1kg", "1-1.5kg", "over-1.5kg"]
+  }
+}
