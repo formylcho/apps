@@ -3,16 +3,51 @@
     "slug": "pc",
     "name": "ノート・モバイルPC",
     "short": "PC",
-    "icon": "💻",
     "status": "active",
     "lead": "メーカーごとのシリーズ体系と、CPU・ディスプレイなどのスペックの読み方を学ぶ。",
     "categoryAxis": "メーカー",
     "categoryNote": "ブランド体系で設計思想が分かれるため、住所はメーカー起点にする"
   },
-  { "slug": "tv", "name": "テレビ", "short": "テレビ", "icon": "📺", "status": "planned", "lead": "パネル方式の違いと映像処理の理解が中心になる。" },
-  { "slug": "aircon", "name": "エアコン", "short": "エアコン", "icon": "❄️", "status": "planned", "lead": "グレードによる機能差と、APF・畳数の読み方。" },
-  { "slug": "fridge", "name": "冷蔵庫", "short": "冷蔵庫", "icon": "🧊", "status": "planned", "lead": "容量帯とドア構成、鮮度保持技術の違い。" },
-  { "slug": "washer", "name": "洗濯機", "short": "洗濯機", "icon": "🫧", "status": "planned", "lead": "ドラム式と縦型、乾燥方式の違いが軸になる。" },
-  { "slug": "vacuum", "name": "掃除機", "short": "掃除機", "icon": "🧹", "status": "planned", "lead": "スティック・ロボット・キャニスターの構造差。" },
-  { "slug": "printer", "name": "プリンター", "short": "プリンター", "icon": "🖨️", "status": "planned", "lead": "インクジェットとレーザー、エコタンクの違い。" }
+  {
+    "slug": "tv",
+    "name": "テレビ",
+    "short": "テレビ",
+    "status": "planned",
+    "lead": "パネル方式の違いと映像処理の理解が中心になる。"
+  },
+  {
+    "slug": "aircon",
+    "name": "エアコン",
+    "short": "エアコン",
+    "status": "planned",
+    "lead": "グレードによる機能差と、APF・畳数の読み方。"
+  },
+  {
+    "slug": "fridge",
+    "name": "冷蔵庫",
+    "short": "冷蔵庫",
+    "status": "planned",
+    "lead": "容量帯とドア構成、鮮度保持技術の違い。"
+  },
+  {
+    "slug": "washer",
+    "name": "洗濯機",
+    "short": "洗濯機",
+    "status": "planned",
+    "lead": "ドラム式と縦型、乾燥方式の違いが軸になる。"
+  },
+  {
+    "slug": "vacuum",
+    "name": "掃除機",
+    "short": "掃除機",
+    "status": "planned",
+    "lead": "スティック・ロボット・キャニスターの構造差。"
+  },
+  {
+    "slug": "printer",
+    "name": "プリンター",
+    "short": "プリンター",
+    "status": "planned",
+    "lead": "インクジェットとレーザー、エコタンクの違い。"
+  }
 ]

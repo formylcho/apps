@@ -167,3 +167,11 @@ h1 {
   h1 { font-size: 1.5rem; }
   .card { padding: 20px 18px; }
 }
+
+.subHead {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 22px 0 4px;
+}
+.card > .subHead:first-of-type { margin-top: 4px; }
