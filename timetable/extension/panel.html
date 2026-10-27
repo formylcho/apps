@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>時間割</title>
+<meta name="description" content="時間割から、シラバスや授業ページへすぐ飛ぶための個人用アプリ。">
+<meta name="theme-color" content="#4a78e0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="時間割">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='104' fill='%234a78e0'/%3E%3Cg fill='%23fff'%3E%3Crect x='112' y='112' width='128' height='128' rx='24'/%3E%3Crect x='272' y='112' width='128' height='128' rx='24' opacity='.6'/%3E%3Crect x='112' y='272' width='128' height='128' rx='24' opacity='.6'/%3E%3Crect x='272' y='272' width='128' height='128' rx='24'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f1f5fc; --panel:#ffffff; --empty:#fdfdfe; --ink:#1f2a3a; --ink-soft:#5b6676; --ink-faint:#8b95a3;
+    --line:#dfe5ee; --accent:#4a78e0; --danger:#c64545; --badge:rgba(255,255,255,.85);
+    --c-blue:#c9dcf8; --c-red:#efb5b5; --c-yellow:#fae7ad; --c-green:#c5e6c8; --c-purple:#dccdf3; --c-gray:#dde2ea;
+    --sans:'Hiragino Kaku Gothic ProN','Hiragino Sans','Yu Gothic','YuGothic','Meiryo',system-ui,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12161d; --panel:#1b212b; --empty:#181d26; --ink:#e8ecf2; --ink-soft:#a9b2bf; --ink-faint:#7a8492;
+      --line:#2c3441; --accent:#7ba0f0; --danger:#e57b7b; --badge:rgba(0,0,0,.28);
+      --c-blue:#2c4470; --c-red:#6e3535; --c-yellow:#6a5722; --c-green:#2d5a36; --c-purple:#4a3a6c; --c-gray:#39414e;
+    }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  button,input,select{font:inherit;color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  header{position:sticky;top:0;z-index:2;background:var(--panel);border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 12px}
+  h1{grid-column:2;margin:0;font-size:20px;font-weight:700;letter-spacing:.02em}
+  header .pill{grid-column:3;justify-self:end}
+  .pill{background:none;border:1.5px solid var(--ink-faint);color:var(--ink-soft);border-radius:999px;
+    padding:9px 14px;font-size:13px;font-weight:600}
+  .pill:hover{border-color:var(--ink);color:var(--ink)}
+
+  .tabs{grid-column:1/-1;display:flex;justify-content:center;gap:4px;margin-top:8px}
+  .tabs button{border:0;background:none;color:var(--ink-soft);font-weight:700;font-size:14px;padding:10px 28px;
+    border-radius:999px}
+  .tabs button[aria-selected=true]{background:var(--accent);color:#fff}
+  .editing .cell{outline:1.5px dashed var(--ink-faint);outline-offset:-1.5px}
+  .editing .cell:not(.filled)::before{content:'＋';margin:auto;color:var(--ink-faint);font-size:20px}
+  .cell:disabled{cursor:default;filter:none}
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:999px;font-size:13.5px;z-index:5;
+    max-width:calc(100% - 32px);text-align:center}
+
+  main{max-width:900px;margin:0 auto;padding:8px 8px 32px}
+  .grid{display:grid;grid-template-columns:44px repeat(6,minmax(0,1fr));gap:6px}
+  .dow{display:flex;justify-content:center;align-items:center;height:44px;color:var(--ink-soft);font-weight:700}
+  .dow span{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .dow.today span{background:var(--accent);color:#fff}
+  .period{display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-soft);
+    font-size:10.5px;line-height:1.25;font-variant-numeric:tabular-nums}
+  .period b{font-size:20px;margin-bottom:4px}
+  .period.now b{color:var(--accent)}
+  .cell{min-height:132px;border:0;border-radius:12px;background:var(--empty);padding:6px 4px;
+    display:flex;flex-direction:column;align-items:center;gap:4px;overflow:hidden}
+  .cell.filled{box-shadow:inset 0 0 0 1px rgba(0,0,0,.04)}
+  .cell:hover{filter:brightness(.97)}
+  .cell .name{flex:1;display:flex;align-items:center;text-align:center;font-weight:600;font-size:13.5px;
+    line-height:1.35;overflow-wrap:anywhere}
+  .cell .badge{width:100%;border-radius:9px;background:var(--badge);font-size:10px;line-height:1.3;color:var(--ink-soft);
+    padding:2px;text-align:center;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;
+    -webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+  .cell.now{box-shadow:inset 0 0 0 2px var(--accent)}
+  .c-blue{background:var(--c-blue)} .c-red{background:var(--c-red)} .c-yellow{background:var(--c-yellow)}
+  .c-green{background:var(--c-green)} .c-purple{background:var(--c-purple)} .c-gray{background:var(--c-gray)}
+  @media (min-width:640px){
+    .grid{grid-template-columns:64px repeat(6,minmax(0,1fr));gap:8px}
+    .cell .name{font-size:15px} .cell .badge{font-size:11.5px} .period{font-size:12px}
+  }
+
+  dialog{border:0;padding:0;background:var(--panel);color:var(--ink);width:min(520px,100%);max-width:100%;
+    max-height:88dvh;border-radius:16px 16px 0 0;margin:auto auto 0;box-shadow:0 -4px 30px rgba(0,0,0,.2)}
+  @media (min-width:640px){dialog{border-radius:16px;margin:auto}}
+  dialog::backdrop{background:rgba(15,20,30,.45)}
+  .sheet{padding:18px 18px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+  .sheet-head{display:flex;align-items:flex-start;gap:10px}
+  .sheet-head h2{flex:1;margin:0;font-size:18px;line-height:1.35}
+  .meta{color:var(--ink-soft);font-size:13px;margin-top:2px}
+  .x{background:none;border:0;font-size:22px;line-height:1;color:var(--ink-faint);padding:8px 12px;min-width:40px;min-height:40px}
+  .links{display:flex;flex-direction:column;gap:8px}
+  .links a{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);border:1px solid var(--line);
+    border-radius:12px;padding:11px 14px}
+  .links a:hover{border-color:var(--accent)}
+  .links a b{font-size:15px}
+  .links a small{color:var(--ink-faint);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hint{color:var(--ink-faint);font-size:13px;margin:0}
+  .row{display:flex;gap:8px;align-items:center}
+  .row.end{justify-content:flex-end}
+  .btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 16px;font-weight:600;font-size:14px}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.danger{color:var(--danger)}
+  .spacer{flex:1}
+  label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-soft);flex:1;min-width:0}
+  label.check{flex-direction:row;align-items:center;gap:8px;font-size:13px}
+  input[type=text],input[type=url],input[type=number],select{width:100%;border:1px solid var(--line);
+    background:var(--bg);border-radius:8px;padding:9px 10px;font-size:16px}
+  .swatches{display:flex;gap:8px}
+  .swatches input{position:absolute;opacity:0}
+  .swatches span{display:block;width:30px;height:30px;border-radius:50%;border:2px solid transparent}
+  .swatches input:checked + span{border-color:var(--ink)}
+  .swatches input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+  .link-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr) auto;gap:6px;align-items:center}
+  fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+  legend{font-size:12px;color:var(--ink-soft);padding:0;margin-bottom:4px}
+  .term-list{display:flex;flex-direction:column;gap:6px}
+  .term-list .row button.btn{flex:1;text-align:left}
+  .term-list .current{border-color:var(--accent);color:var(--accent)}
+  @media (prefers-reduced-motion:no-preference){.cell{transition:filter .12s}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="termTitle"></h1>
+  <button class="pill" id="termBtn" type="button">学期切替</button>
+  <div class="tabs" role="tablist" aria-label="画面の切り替え">
+    <button type="button" role="tab" id="tabView" aria-selected="true">時間割</button>
+    <button type="button" role="tab" id="tabEdit" aria-selected="false">編集</button>
+  </div>
+</header>
+<main>
+  <p class="hint" id="emptyHint" style="text-align:center;margin:10px 0" hidden>まだ授業がありません。「編集」タブでコマをタップして登録します。</p>
+  <div class="grid" id="grid"></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+</main>
+
+<dialog id="viewDlg" aria-labelledby="viewName">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0">
+        <h2 id="viewName"></h2>
+        <div class="meta" id="viewMeta"></div>
+      </div>
+      <button class="x" type="button" data-close aria-label="閉じる">×</button>
+    </div>
+    <div class="links" id="viewLinks"></div>
+  </div>
+</dialog>
+
+<dialog id="editDlg" aria-labelledby="editTitle">
+  <form class="sheet" id="editForm" method="dialog">
+    <div class="sheet-head">
+      <h2 id="editTitle"></h2>
+      <button class="x" type="button" data-close aria-label="閉じる">×</button>
+    </div>
+    <label>授業名<input type="text" id="fName" required maxlength="60" autocomplete="off"></label>
+    <div class="row">
+      <label>教室<input type="text" id="fRoom" maxlength="40" autocomplete="off"></label>
+      <label>担当教員<input type="text" id="fTeacher" maxlength="40" autocomplete="off"></label>
+    </div>
+    <fieldset>
+      <legend>色</legend>
+      <div class="swatches" id="fColors"></div>
+    </fieldset>
+    <fieldset>
+      <legend>遷移先のURL（1本ならタップでそのまま開きます）</legend>
+      <div id="fLinks" style="display:flex;flex-direction:column;gap:6px"></div>
+      <div><button class="btn" type="button" id="addLink">＋ リンクを追加</button></div>
+    </fieldset>
+    <label class="check" id="fSameWrap"><input type="checkbox" id="fSame"><span id="fSameText"></span></label>
+    <div class="row">
+      <button class="btn danger" type="button" id="delCell">このコマを削除</button>
+      <span class="spacer"></span>
+      <button class="btn primary" type="submit">保存</button>
+    </div>
+  </form>
+  <datalist id="linkLabels">
+    <option value="シラバス"><option value="Classroom"><option value="学内サイト"><option value="Moodle"><option value="資料"><option value="Zoom">
+  </datalist>
+</dialog>
+
+<dialog id="termDlg" aria-labelledby="termDlgTitle">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="termDlgTitle">学期切替</h2>
+      <button class="x" type="button" data-close aria-label="閉じる">×</button>
+    </div>
+    <div class="term-list" id="termList"></div>
+    <form class="row" id="termForm" style="align-items:flex-end">
+      <label>年度<input type="number" id="tYear" min="2000" max="2100" required></label>
+      <label>学期<select id="tNo"><option value="1">1学期</option><option value="2">2学期</option><option value="3">3学期</option><option value="4">4学期</option></select></label>
+      <button class="btn" type="submit">追加</button>
+    </form>
+    <div class="row">
+      <button class="btn" type="button" id="exportBtn">書き出し</button>
+      <button class="btn" type="button" id="importBtn">読み込み</button>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <p class="hint">データはこのブラウザ内にだけ保存されます。別の端末へ移すときは書き出し→読み込みを使います。</p>
+  </div>
+</dialog>
+
+<script src="panel.js"></script>
+</body>
+</html>

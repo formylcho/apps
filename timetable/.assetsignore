@@ -1,0 +1,6 @@
+wrangler.jsonc
+.wrangler
+.gitignore
+.assetsignore
+extension
+build-extension.mjs
